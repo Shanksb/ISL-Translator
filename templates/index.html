@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SignSpeak – AI Sign Language Platform</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        html {
+            scroll-behavior: smooth;
+        }
+
+        * {
+            margin: 0; padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Poppins", sans-serif;
+            background: #05050a;
+            color: white;
+            overflow-x: hidden;
+        }
+
+        /* Background animation */
+        body::before {
+            content: "";
+            position: fixed;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(0,198,255,0.05), transparent 70%);
+            z-index: -1;
+            animation: rotateBG 120s linear infinite;
+        }
+
+        @keyframes rotateBG {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* NAVBAR */
+        nav {
+            width: 100%;
+            padding: 20px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            top: 0;
+            backdrop-filter: blur(12px);
+            background: rgba(10, 10, 20, 0.4);
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            z-index: 100;
+        }
+
+        nav .logo {
+            font-size: 1.6rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, #00c6ff, #0072ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        nav a {
+            color: #d5d5d5;
+            text-decoration: none;
+            margin-left: 25px;
+            font-weight: 400;
+            transition: 0.2s ease;
+        }
+
+        nav a:hover {
+            color: white;
+        }
+
+        /* HERO SECTION */
+        .hero {
+            width: 100%;
+            padding-top: 120px;
+            padding-bottom: 120px;
+            text-align: center;
+            background: radial-gradient(circle at center, rgba(0, 120, 255, 0.2), rgba(0,0,0,1) 65%);
+            position: relative;
+        }
+
+        /* Light-Tunnel Glow */
+        .hero::before {
+            content: "";
+            position: absolute;
+            top: -200px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 1600px;
+            height: 1600px;
+            background: conic-gradient(
+                from 0deg,
+                #0080ff22,
+                #00c6ff33,
+                #007bff22,
+                #0044ff11,
+                #0080ff22
+            );
+            filter: blur(150px);
+            z-index: -1;
+            border-radius: 50%;
+            animation: rotateGlow 18s linear infinite;
+            opacity: 0.55;
+        }
+
+        @keyframes rotateGlow {
+            0% { transform: translateX(-50%) rotate(0deg); }
+            100% { transform: translateX(-50%) rotate(360deg); }
+        }
+
+        .hero h1 {
+            font-size: 3.4rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            line-height: 1.2;
+        }
+
+        .hero p {
+            max-width: 700px;
+            margin: auto;
+            line-height: 1.5;
+            font-size: 1.2rem;
+            color: #cfcfcf;
+        }
+
+        .hero .cta {
+            margin-top: 40px;
+        }
+
+        .cta-btn {
+            padding: 14px 32px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            text-decoration: none;
+            color: #fff;
+            background: linear-gradient(135deg, #0078ff, #00c6ff);
+            box-shadow: 0 0 20px rgba(0,140,255,0.5);
+            transition: 0.3s ease;
+            text-shadow: 0 0 6px #00c6ff;
+        }
+
+        .cta-btn:hover {
+            transform: translateY(-4px) scale(1.03);
+            box-shadow: 0 0 30px rgba(0,140,255,0.7);
+        }
+
+        /* FEATURE SECTION */
+        .features {
+            width: 85%;
+            max-width: 1300px;
+            margin: 100px auto;
+        }
+
+        .features h2 {
+            text-align: center;
+            font-size: 2.4rem;
+            margin-bottom: 40px;
+        }
+
+        .cards {
+            display: flex;
+            gap: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .card {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.08);
+            padding: 25px;
+            width: 330px;
+            border-radius: 18px;
+            backdrop-filter: blur(14px);
+            box-shadow: 0 0 18px rgba(0,0,0,0.4), inset 0 0 40px rgba(0,150,255,0.07);
+            transition: 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 0 25px rgba(0,150,255,0.15);
+        }
+
+        /* Glowing hover for card headings */
+        .card:hover h3 {
+            text-shadow: 0 0 8px #00c6ff, 0 0 16px #0072ff;
+        }
+
+        .card h3 {
+            font-size: 1.4rem;
+            margin-bottom: 12px;
+            background: linear-gradient(90deg, #00c6ff, #0072ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .card p {
+            color: #d0d0d0;
+            line-height: 1.5;
+        }
+
+        /* Alphabet Gallery */
+        .alphabet-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 20px;
+            justify-items: center;
+            margin-top: 30px;
+        }
+
+        .alphabet-card {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.08);
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+            transition: 0.3s ease;
+        }
+
+        .alphabet-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 0 15px #00c6ff;
+        }
+
+        .alphabet-card img {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            margin-bottom: 8px;
+        }
+
+        .alphabet-label {
+            font-weight: 600;
+            color: #cfcfcf;
+        }
+
+        /* FULLSCREEN IMAGE VIEWER */
+        #imageViewer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.85);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        #imageViewer img {
+            max-width: 80%;
+            max-height: 80%;
+            border-radius: 12px;
+            box-shadow: 0 0 25px rgba(0,150,255,0.4);
+        }
+
+        #closeViewerBtn {
+            position: absolute;
+            top: 40px;
+            right: 50px;
+            font-size: 26px;
+            background: #ff3b3b;
+            color: white;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            box-shadow: 0 0 10px rgba(255,0,0,0.4);
+        }
+        #closeViewerBtn:hover {
+            background: #d72e2e;
+        }
+
+
+        /* FOOTER */
+        footer {
+            text-align: center;
+            padding: 40px 0;
+            color: #8f8f8f;
+            font-size: 0.95rem;
+            margin-top: 80px;
+        }
+    </style>
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<nav>
+    <div class="logo">SignSpeak</div>
+    <div>
+        <a href="/">Home</a>
+        <a href="/predict">Live Demo</a>
+        <a href="#features">Why Choose Us?</a>
+        <a href="#alphabets">Alphabets</a>
+    </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+    <h1>The Future of Sign Language Recognition</h1>
+    <p>
+        Experience next-generation AI that understands Indian Sign Language (ISL) in real-time
+        with exceptional accuracy, smooth performance, and a clean futuristic interface.
+    </p>
+
+    <div class="cta">
+        <a href="/predict" class="cta-btn">Try Live Prediction</a>
+    </div>
+</section>
+
+<!-- FULLSCREEN IMAGE VIEWER -->
+<div id="imageViewer">
+    <img id="viewerImage" src="">
+    <button id="closeViewerBtn" onclick="closeViewer()">Close</button>
+</div>
+<script>
+function openViewer(src) {
+    document.getElementById("viewerImage").src = src;
+    document.getElementById("imageViewer").style.display = "flex";
+}
+
+function closeViewer() {
+    document.getElementById("imageViewer").style.display = "none";
+}
+</script>
+
+
+<!-- FEATURES -->
+<section id="features" class="features">
+    <h2>Why Choose SignSpeak?</h2>
+
+    <div class="cards">
+
+        <div class="card">
+            <h3>Real-Time Detection</h3>
+            <p>Powered by advanced AI models for instant ISL alphabet recognition with minimal latency.</p>
+        </div>
+
+        <div class="card">
+            <h3>High Accuracy</h3>
+            <p>Our fine-tuned deep learning model is trained on high-quality datasets for reliable predictions.</p>
+        </div>
+
+        <div class="card">
+            <h3>Clean UI/UX</h3>
+            <p>An elegant Web3-inspired interface with glossy cards, soft shadows, and neon gradients.</p>
+        </div>
+
+        <div class="card">
+            <h3>Open & Accessible</h3>
+            <p>Designed to help bridge communication gaps and enhance accessibility for everyone.</p>
+        </div>
+
+        <div class="card">
+            <h3>Fully Browser-Based</h3>
+            <p>No installations required—works directly through your webcam inside the browser.</p>
+        </div>
+
+        <div class="card">
+            <h3>Sentence Builder</h3>
+            <p>Create words and convert them into meaningful sentences with full manual control.</p>
+        </div>
+
+    </div>
+</section>
+
+<!-- ALPHABET GALLERY -->
+<section id="alphabets" class="features">
+    <h2>Learn the Alphabets</h2>
+    <div class="alphabet-grid">
+        <div class="alphabet-card">
+            <img src="static/alphabets/A.webp" alt="A" onclick="openViewer(this.src)" style="cursor: pointer;">
+            <div class="alphabet-label">A</div>
+        </div>
+        <div class="alphabet-card">
+            <img src="static/alphabets/B.webp" alt="B" onclick="openViewer(this.src)" style="cursor: pointer;">
+            <div class="alphabet-label">B</div>
+        </div>
+        <div class="alphabet-card">
+            <img src="static/alphabets/C.webp" alt="C" onclick="openViewer(this.src)" style="cursor: pointer;">
+            <div class="alphabet-label">C</div>
+        </div>
+        <div class="alphabet-card">
+            <img src="static/alphabets/D.webp" alt="D" onclick="openViewer(this.src)" style="cursor: pointer;">
+            <div class="alphabet-label">D</div>
+        </div>
+        <div class="alphabet-card">
+            <img src="static/alphabets/E.jpg" alt="E" onclick="openViewer(this.src)" style="cursor: pointer;">
+            <div class="alphabet-label">E</div>
+        </div>
+        <div class="alphabet-card">
+            <img src="static/alphabets/F.jpg" alt="F" onclick="openViewer(this.src)" style="cursor: pointer;">
+            <div class="alphabet-label">F</div>
+        </div>
+        <div class="alphabet-card">
+            <img src="static/alphabets/G.webp" alt="G" onclick="openViewer(this.src)" style="cursor: pointer;">
+            <div class="alphabet-label">G</div>
+        </div>
+        <div class="alphabet-card">
+            <img src="static/alphabets/H.webp" alt="H" onclick="openViewer(this.src)" style="cursor: pointer;">
+            <div class="alphabet-label">H</div>
+        </div>
+        <div class="alphabet-card">
+            <img src="static/alphabets/I.webp" alt="I" onclick="openViewer(this.src)" style="cursor: pointer;">
+            <div class="alphabet-label">I</div>
+        </div>
+        <div class="alphabet-card">
+            <img src="static/alphabets/J.webp" alt="J" onclick="openViewer(this.src)" style="cursor: pointer;">
+            <div class="alphabet-label">J</div>
+        </div>
+        <div class="alphabet-card">
+            <img src="static/alphabets/K.webp" alt="K" onclick="openViewer(this.src)" style="cursor: pointer;">
+            <div class="alphabet-label">K</div>
+        </div>
+        <div class="alphabet-card">
+            <img src="static/alphabets/L.webp" alt="L" onclick="openViewer(this.src)" style="cursor: pointer;">
+            <div class="alphabet-label">L</div>
+        </div>
+        <div class="alphabet-card">
+            <img src="static/alphabets/M.webp" alt="M" onclick="openViewer(this.src)" style="cursor: pointer;">
+            <div class="alphabet-label">M</div>
+        </div>
+        <div class="alphabet-card">
+            <img src="static/alphabets/N.webp" alt="N" onclick="openViewer(this.src)" style="cursor: pointer;">
+            <div class="alphabet-label">N</div>
+        </div>
+        <div class="alphabet-card">
+            <img src="static/alphabets/O.webp" alt="O" onclick="openViewer(this.src)" style="cursor: pointer;">
+            <div class="alphabet-label">O</div>
+        </div>
+        <div class="alphabet-card">
+            <img src="static/alphabets/P.webp" alt="P" onclick="openViewer(this.src)" style="cursor: pointer;">
+            <div class="alphabet-label">P</div>
+        </div>
+        <div class="alphabet-card">
+            <img src="static/alphabets/Q.webp" alt="Q" onclick="openViewer(this.src)" style="cursor: pointer;">
+            <div class="alphabet-label">Q</div>
+        </div>
+        <div class="alphabet-card">
+            <img src="static/alphabets/R.webp" alt="R" onclick="openViewer(this.src)" style="cursor: pointer;">
+            <div class="alphabet-label">R</div>
+        </div>
+        <div class="alphabet-card">
+            <img src="static/alphabets/S.webp" alt="S" onclick="openViewer(this.src)" style="cursor: pointer;">
+            <div class="alphabet-label">S</div>
+        </div>
+        <div class="alphabet-card">
+            <img src="static/alphabets/T.webp" alt="T" onclick="openViewer(this.src)" style="cursor: pointer;">
+            <div class="alphabet-label">T</div>
+        </div>
+        <div class="alphabet-card">
+            <img src="static/alphabets/U.webp" alt="U" onclick="openViewer(this.src)" style="cursor: pointer;">
+            <div class="alphabet-label">U</div>
+        </div>
+        <div class="alphabet-card">
+            <img src="static/alphabets/V.webp" alt="V" onclick="openViewer(this.src)" style="cursor: pointer;">
+            <div class="alphabet-label">V</div>
+        </div>
+        <div class="alphabet-card">
+            <img src="static/alphabets/W.webp" alt="W" onclick="openViewer(this.src)" style="cursor: pointer;">
+            <div class="alphabet-label">W</div>
+        </div>
+        <div class="alphabet-card">
+            <img src="static/alphabets/X.webp" alt="X" onclick="openViewer(this.src)" style="cursor: pointer;">
+            <div class="alphabet-label">X</div>
+        </div>
+        <div class="alphabet-card">
+            <img src="static/alphabets/Y.webp" alt="Y" onclick="openViewer(this.src)" style="cursor: pointer;">
+            <div class="alphabet-label">Y</div>
+        </div>
+        <div class="alphabet-card">
+            <img src="static/alphabets/Z.webp" alt="Z" onclick="openViewer(this.src)" style="cursor: pointer;">
+            <div class="alphabet-label">Z</div>
+        </div>
+    </div>
+</section>
+
+
+<!-- FOOTER -->
+<footer>
+    © 2025 SignSpeak – Indian Sign Language Recognition
+</footer>
+
+</body>
+</html>

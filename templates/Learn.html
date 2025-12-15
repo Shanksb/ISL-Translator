@@ -1,0 +1,12 @@
+<div class="page-container">
+    <h1 class="title">Indian Sign Language – Alphabets</h1>
+
+    <div class="alphabet-grid">
+        {% for letter in alphabets %}
+        <div class="alphabet-card">
+            <img src="{{ url_for('static', filename='alphabets/' + letter.image) }}" alt="{{ letter.char }}" />
+            <p class="alphabet-label">{{ letter.char }}</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>

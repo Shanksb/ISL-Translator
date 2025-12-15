@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Predict – SignSpeak</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background: radial-gradient(circle at top, #0a0f1f, #05060d 70%);
+            color: white;
+        }
+
+        /* NAVBAR */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            padding: 20px 40px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(6px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .navbar a {
+            color: #9fc5ff;
+            text-decoration: none;
+            font-weight: 500;
+            margin-left: 30px;
+        }
+
+        .navbar a:hover {
+            color: #ffffff;
+        }
+
+        .logo {
+            font-size: 26px;
+            font-weight: 700;
+            background: linear-gradient(90deg, #66aaff, #89d3ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* LAYOUT */
+        .container {
+            margin: 50px auto;
+            width: 90%;
+            display: flex;
+            gap: 40px;
+        }
+
+        /* LEFT: CAMERA FEED */
+        .video-card {
+            flex: 1;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            border-radius: 20px;
+            padding: 20px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 4px 20px rgba(0, 140, 255, 0.2);
+        }
+
+        #video {
+            width: 100%;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* RIGHT: PREDICTION PANEL */
+        .prediction-panel {
+            width: 380px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #cee6ff;
+        }
+
+        .box {
+            background: rgba(255, 255, 255, 0.06);
+            padding: 15px;
+            border-radius: 12px;
+            min-height: 50px;
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            margin-bottom: 15px;
+            font-size: 20px;
+            color: #ffffff;
+        }
+
+        /* BUTTONS */
+        .btn {
+            border: none;
+            padding: 10px 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            margin: 5px 0;
+            font-size: 14px;
+        }
+
+        .btn-blue {
+            background: linear-gradient(90deg, #228aff, #42c2ff);
+            color: white;
+        }
+
+        .btn-blue:hover { background: linear-gradient(90deg, #1b6fcb, #31a9e6); }
+
+        .btn-red {
+            background: #ff4d4d;
+            color: white;
+        }
+
+        .btn-red:hover { background: #e64040; }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid #66aaff;
+            color: #a8cfff;
+        }
+
+        .btn-outline:hover {
+            background: rgba(102, 170, 255, 0.1);
+            color: white;
+        }
+
+        .current-output {
+            font-size: 32px;
+            text-align: center;
+            margin-bottom: 20px;
+            color: #66b8ff;
+            letter-spacing: 2px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- NAVBAR -->
+    <div class="navbar">
+        <div class="logo">SignSpeak</div>
+        <div>
+            <a href="/">Home</a>
+            <a href="/predict">Predict</a>
+        </div>
+    </div>
+
+    <div class="container">
+
+        <!-- LEFT SIDE: VIDEO -->
+        <div class="video-card">
+            <h2 class="section-title">Live Camera Feed</h2>
+            <img id="video" src="/video_feed">
+        </div>
+
+        <!-- RIGHT SIDE: PREDICTION PANEL -->
+        <div class="prediction-panel">
+
+            <div class="section-title">Current Prediction</div>
+            <div class="current-output" id="currentPrediction">—</div>
+
+            <button class="btn btn-outline" onclick="manualAdd()">Add Letter</button>
+            <button class="btn btn-red" onclick="clearLetter()">Remove Last Letter</button>
+            <button class="btn btn-blue" onclick="fetch('/clear_prediction')">Clear Model Prediction</button>
+
+            <hr style="border: none; border-bottom: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+            <div class="section-title">Word</div>
+            <div class="box" id="wordBox"></div>
+            <button class="btn btn-blue" onclick="addWord()">Add Word to Sentence</button>
+            <!-- Suggestions Section -->
+            <div class="section-title">Suggestions</div>
+            <div id="suggestionsBox" class="box" style="font-size:16px; cursor:pointer;"></div>
+
+
+            <button class="btn btn-red" onclick="removeLastChar()">Remove Last Character</button>
+
+            <hr style="border: none; border-bottom: 1px solid rgba(255,255,255,0.1); margin: 20px 0;">
+
+            <div class="section-title">Sentence</div>
+            <div class="box" id="sentenceBox"></div>
+
+            <button class="btn btn-red" onclick="removeLastWord()">Remove Last Word</button>
+            <button class="btn btn-red" onclick="clearSentence()">Clear Sentence</button>
+
+        </div>
+    </div>
+
+    <script>
+        let word = "";
+        let sentence = [];
+
+        function updateUI() {
+            document.getElementById("wordBox").innerText = word || "—";
+            document.getElementById("sentenceBox").innerText =
+                sentence.length ? sentence.join(" ") : "—";
+            
+            updateSuggestions();
+        }
+
+        function manualAdd() {
+            fetch("/get_prediction")
+                .then(res => res.json())
+                .then(data => {
+                    if (data.prediction) {
+                        word += data.prediction;
+                        updateUI();
+                        updateSuggestions();
+                    }
+                });
+        }
+
+        function clearLetter() {
+            if (word.length > 0) {
+                word = word.slice(0, -1);
+                updateUI();
+            }
+        }
+
+        function addWord() {
+            if (word.trim().length > 0) {
+                sentence.push(word);
+                word = "";
+                updateUI();
+            }
+        }
+
+        function removeLastWord() {
+            sentence.pop();
+            updateUI();
+        }
+
+        function clearSentence() {
+            sentence = [];
+            updateUI();
+        }
+
+        function removeLastChar() {
+            word = word.slice(0, -1);
+            updateUI();
+        }
+
+        // Load dictionary suggestions offline
+        let dictionary = [];
+        fetch("/static/words.json")
+            .then(res => res.json())
+            .then(data => dictionary = data);
+        
+        // Update suggestions based on current word
+        function updateSuggestions() {
+            if (!word) {
+                document.getElementById("suggestionsBox").innerHTML = "—";
+                return;
+            }
+
+            let matches = dictionary.filter(w => w.startsWith(word.toLowerCase())).slice(0, 5);
+
+            if (matches.length === 0) {
+                document.getElementById("suggestionsBox").innerHTML = "No suggestions";
+                return;
+            }
+
+            document.getElementById("suggestionsBox").innerHTML = matches
+                .map(m => `<div onclick="applySuggestion('${m}')">${m}</div>`)
+                .join("");
+        }
+
+        // Apply selected suggestion to word box
+        function applySuggestion(s) {
+            word = s;
+            updateUI();
+            updateSuggestions();
+        }
+
+
+
+        // Live prediction polling
+        setInterval(() => {
+            fetch("/get_prediction")
+                .then(res => res.json())
+                .then(data => {
+                    document.getElementById("currentPrediction").innerText =
+                        data.prediction || "—";
+                });
+        }, 200);
+    </script>
+
+</body>
+</html>
